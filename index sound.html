@@ -35,7 +35,7 @@ document.body.addEventListener('click', () => {
   if (win && !win.closed) { music.paused ? music.play() : music.pause(); return; }
   music.play();
 
-  win = window.open('', 'green', 'width=' + WIN_W + ',height=' + WIN_H + ',resizable=no,scrollbars=no');
+  win = window.open('', 'green', 'width=' + WIN_W + ',height=' + WIN_H + ',resizable=yes,scrollbars=no');
   if (win) {
     win.document.open();
     win.document.write(
@@ -55,7 +55,12 @@ document.body.addEventListener('click', () => {
       'var m=window.opener&&window.opener.document.getElementById("music");' +
       'function sync(){if(m)document.body.classList.toggle("on",!m.paused);}' +
       'if(m){m.addEventListener("play",sync);m.addEventListener("pause",sync);}' +
-      'document.body.onclick=function(){if(!m)return;if(m.paused){m.play();}else{m.pause();}};' +
+      // 한 번 클릭: 음악 멈춤/재생, 두 번 클릭(더블클릭): 전체 화면 켜기/끄기
+      'var ct=null;' +
+      'document.body.onclick=function(){if(ct){clearTimeout(ct);ct=null;return;}ct=setTimeout(function(){ct=null;if(!m)return;if(m.paused){m.play();}else{m.pause();}},250);};' +
+      'document.body.ondblclick=function(){var d=document,e=d.documentElement;' +
+      'if(d.fullscreenElement||d.webkitFullscreenElement){(d.exitFullscreen||d.webkitExitFullscreen).call(d);}' +
+      'else{(e.requestFullscreen||e.webkitRequestFullscreen).call(e);}};' +
       'setTimeout(sync,50);' +
       '<\/script></body></html>');
     win.document.close();
